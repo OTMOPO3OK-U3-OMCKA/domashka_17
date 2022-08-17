@@ -61,7 +61,6 @@ class MovieSchema(Schema):
         return cl.name
 
 
-
 sch = MovieSchema()
 
 
@@ -80,17 +79,17 @@ class MovieView(Resource):
             elif gg == None and dd != None:
                 mm = db.session.query(Movie).filter(Movie.director_id == int(dd))
                 for i in mm:
-                    list_movie.append(i.title)
+                    list_movie.append(sch.dump(i))
                 return list_movie, 200
             elif dd == None:
                 mm = db.session.query(Movie).filter(Movie.genre_id == int(gg))
                 for i in mm:
-                    list_movie.append(i.title)
+                    list_movie.append(sch.dump(i))
                 return list_movie, 200
             else:
                 mm = db.session.query(Movie).filter(Movie.genre_id == int(gg), Movie.director_id == int(dd))
                 for i in mm:
-                    list_movie.append(i.title)
+                    list_movie.append(sch.dump(i))
                 return list_movie, 200
         except ValueError:
             return '', 201
@@ -112,7 +111,7 @@ class MovieView2(Resource):
     def get(self, uid):
         try:
             movie = Movie.query.get(uid)
-            return movie.description, 200
+            return sch.dump(movie), 200
         except AttributeError:
             return '', 201
 
@@ -146,7 +145,7 @@ class DirectorView(Resource):
         directors_list = []
         directors = Director.query.all()
         for i in directors:
-            directors_list.append(i.name)
+            directors_list.append(sch.dump(i))
 
         return directors_list
 
@@ -167,7 +166,7 @@ class GenreView(Resource):
         g = []
         g2 = Genre.query.all()
         for i in g2:
-            g.append(i.name)
+            g.append(sch.dump(i))
         return jsonify(g)
 
 
