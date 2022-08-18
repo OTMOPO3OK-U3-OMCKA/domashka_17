@@ -145,7 +145,7 @@ class DirectorView(Resource):
         directors_list = []
         directors = Director.query.all()
         for i in directors:
-            directors_list.append(sch.dump(i))
+            directors_list.append(i.name)
 
         return directors_list
 
@@ -166,7 +166,7 @@ class GenreView(Resource):
         g = []
         g2 = Genre.query.all()
         for i in g2:
-            g.append(sch.dump(i))
+            g.append(i.name)
         return jsonify(g)
 
 
