@@ -61,8 +61,13 @@ class MovieSchema(Schema):
         return cl.name
 
 
-sch = MovieSchema()
+class NameSchema(Schema):
+    id = fields.Int()
+    name = fields.Str()
 
+
+sch = MovieSchema()
+sch2 = NameSchema()
 
 @movies_ns.route('/')
 class MovieView(Resource):
@@ -110,8 +115,8 @@ class MovieView(Resource):
 class MovieView2(Resource):
     def get(self, uid):
         try:
-            movie = Movie.query.get(uid)
-            return sch.dump(movie), 200
+            genre = Genre.query.get(uid)
+            return sch2.dump(genre), 200
         except AttributeError:
             return '', 201
 
@@ -145,7 +150,7 @@ class DirectorView(Resource):
         directors_list = []
         directors = Director.query.all()
         for i in directors:
-            directors_list.append(i.name)
+            directors_list.append(sch2.dump(i))
 
         return directors_list
 
@@ -153,11 +158,11 @@ class DirectorView(Resource):
 @directors_ns.route('/<int:uid>')
 class DirectorIdView(Resource):
     def get(self, uid):
-        d = []
-        d2 = Movie.query.filter(Movie.director_id == uid)
-        for i in d2:
-            d.append(sch.dump(i))
-        return jsonify(d)
+        g2 = Director.query.get(uid)
+        if g2 == None:
+            return {"режиссёр": "не найден"}
+        return sch2.dump(g2)
+
 
 
 @genres_ns.route('/')
@@ -166,18 +171,17 @@ class GenreView(Resource):
         g = []
         g2 = Genre.query.all()
         for i in g2:
-            g.append(i.name)
+            g.append(sch2.dump(i))
         return jsonify(g)
 
 
 @genres_ns.route('/<int:uid>')
 class GenreView(Resource):
     def get(self, uid):
-        g = []
-        g2 = Movie.query.filter(Movie.genre_id == uid)
-        for i in g2:
-            g.append(sch.dump(i))
-        return jsonify(g)
+        g2 = Genre.query.get(uid)
+        if g2 == None:
+            return {"жанр": "не найден"}
+        return sch2.dump(g2)
 
 if __name__ == '__main__':
     app.run(debug=True)
